@@ -4,6 +4,8 @@ from functools import partial
 from overrides import override
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 
+from evalscope.pruning.hook import apply_pruning  # noqa: E402  [pruning]
+
 from evalscope.api.agent import AgentLoopResult
 from evalscope.api.dataset import DataLoader, Dataset, DatasetDict, LocalDataLoader, RemoteDataLoader, Sample
 from evalscope.api.evaluator import InferenceResult, InferenceReturn, TaskState
@@ -64,6 +66,13 @@ class DefaultDataAdapter(DataAdapter):
 
         # Process each sample's input by applying prompt templates and few-shot formatting
         self._post_process_samples()
+
+        # Apply dataset pruning if requested via --dataset-args
+        self.test_dataset = apply_pruning(
+            self.test_dataset,
+            benchmark_name=self._benchmark_meta.name,
+            extra_params=self.extra_params,
+        )
 
         return self.test_dataset
 
