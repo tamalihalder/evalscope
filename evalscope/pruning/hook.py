@@ -43,7 +43,7 @@ def apply_pruning(
     ref_dir = extra_params.get("reference_dir")
     ref_scores = None
     if ref_dir:
-        from pruning.loader import load_reference_scores
+        from .loader import load_reference_scores
         ref_dir = Path(ref_dir)
         if ref_dir.exists():
             ref_scores = load_reference_scores(ref_dir, benchmark=benchmark_name)
@@ -81,7 +81,7 @@ def apply_pruning(
 
     # For MMMU probe: extract per-sample visual metadata
     if "mmmu" in benchmark_name.lower():
-        from pruning.mmmu_probe import MMUProbePruner
+        from .mmmu_probe import MMUProbePruner
         sample_meta = {}
         for s in samples:
             idx = getattr(s, "index", None)
@@ -91,7 +91,7 @@ def apply_pruning(
             extra_params = {**extra_params, "_sample_meta": sample_meta}
 
     # Get the pruner and select indices
-    from pruning.registry import get_pruner
+    from .registry import get_pruner
     pruner = get_pruner(strategy, prune_ratio=prune_ratio, **pruner_kwargs)
     keep_indices = pruner.select_indices(
         all_indices=all_indices,
